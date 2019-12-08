@@ -12,7 +12,7 @@ public class Main {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {  
 			public void run() {  JFrame frame = new JFrame("A World of Balls");  
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
-			frame.setContentPane(new BallWorld(640, 480)); // BallWorld is a JPanel  
+			frame.setContentPane(new BallWorld(880 , 700)); // BallWorld is a JPanel  
 			frame.pack();            // Preferred size of BallWorld  
 			frame.setVisible(true);  // Show it  
 			}  
