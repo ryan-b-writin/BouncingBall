@@ -1,2 +1,5 @@
 # BouncingBall
-rework of Simple Bouncing Ball exercise
+Rework of Simple Bouncing Ball exercise
+
+Following along with:
+Java Game Programming, by Neos. Thanth
