@@ -82,8 +82,12 @@ public class BallWorld extends JPanel {
 	/**  * One game time-step.  
 	 *  Update the game objects, with proper collision detection and response.  */  
 	public void gameUpdate() {  
-		ball.moveOneStepWithCollisionDetection(box);  
+		// Detect collision for this ball with the container box.  
+		ball.intersect(box);  
+		// Update the ball's state with proper collision response if collided.  
+		ball.update();  
 	}  
+	
 	
 	/** The custom drawing panel for the bouncing ball (inner class). */  
 	class DrawCanvas extends JPanel {  
@@ -107,6 +111,8 @@ public class BallWorld extends JPanel {
 		@Override  
 		public Dimension getPreferredSize() {  
 			return (new Dimension(canvasWidth, canvasHeight));  
-		}  
+		} 
+		
+		
 	}  
 }
