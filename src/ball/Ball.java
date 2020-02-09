@@ -103,45 +103,39 @@ public class Ball {
 	private StringBuilder sb = new StringBuilder();  
 	private Formatter formatter = new Formatter(sb); 
 	
-	// Working copy for computing response in intersect(ContainerBox box),  
+	// Working copy for computing response in intersect(box, timeLimit),  
 	// to avoid repeatedly allocating objects.  
 	private CollisionResponse tempResponse = new CollisionResponse();  
-	
-	/** Check if this ball collides with the container box in the coming time-step. 
-	 *  
-	 * @param box: container (obstacle) for this ball  */  
-	public void intersect(ContainerBox box) {  
+	/**  * Check if this ball collides with the container box in the interval  
+	* (0, timeLimit].  */  
+	public void intersect(ContainerBox box, float timeLimit) {  
 		// Call movingPointIntersectsRectangleOuter, which returns the  
 		// earliest collision to one of the 4 borders, if collision detected.  
-		CollisionPhysics.pointIntersectsRectangleOuter(  
-				this.x, this.y, this.speedX, this.speedY, this.radius,  
-				box.minX, box.minY, box.maxX, box.maxY,  1.0f, tempResponse);  
+		CollisionPhysics.pointIntersectsRectangleOuter(x, y, speedX, speedY, radius,  
+				box.minX, box.minY, box.maxX, box.maxY, timeLimit, tempResponse);  
 		if (tempResponse.t < earliestCollisionResponse.t) {  
 			earliestCollisionResponse.copy(tempResponse);  
-			}  
 		}  
-	/**  
-	 * Update the states of this ball for one time-step.
-	 * Move for one time-step if no collision occurs; otherwise move up to
-	 * the earliest detected collision.  */  
-	public void update() {  
-		// Check the earliest collision detected for this ball stored in  
-		// earliestCollisionResponse.  
-		if (earliestCollisionResponse.t <= 1.0f) {  
-			// Collision detected  
+	}  
+	public void update(float time) {  
+		// Check if this ball is responsible for the first collision?  
+		if (earliestCollisionResponse.t <= time) {  
 			// This ball collided, get the new position and speed  
 			this.x = earliestCollisionResponse.getNewX(this.x, this.speedX);  
 			this.y = earliestCollisionResponse.getNewY(this.y, this.speedY);  
 			this.speedX = (float)earliestCollisionResponse.newSpeedX;  
 			this.speedY = (float)earliestCollisionResponse.newSpeedY;  
 		} else {  
-			// No collision in this coming time-step  
-			// Make a complete move  
-			this.x += this.speedX;          
-			this.y += this.speedY;          
+			// This ball does not involve in a collision. Move straight.  
+			this.x += this.speedX * time;          
+			this.y += this.speedY * time;          
 		}  
-		// Clear for the next collision detection  
-		earliestCollisionResponse.reset();  
-	}
+		// Clear for the next collision detection  earliestCollisionResponse.reset();  
+	}  
 }
+		
+		
+	
+		
+	
 
