@@ -7,6 +7,7 @@ import javax.swing.*;
 /**  * The control logic and main display panel for game.  */ 
 
 public class BallWorld extends JPanel {  
+	private static final float EPSILON_TIME = 1e-2f; //threshold for zero time
 	private static final int UPDATE_RATE = 30; // Frames per second (fps) 
 	private Ball ball;         // A single bouncing Ball's instance 
 	private ContainerBox box;  // The container rectangular box  
@@ -56,39 +57,56 @@ public class BallWorld extends JPanel {
 	}  
 	
 	/** Start the ball bouncing. */  
-	public void gameStart() {  
-		
-		// Run the game logic in its own thread.  
+	public void gameStart() {  // Run the game logic in its own thread.  
 		Thread gameThread = new Thread() {  
 			public void run() {  
 				while (true) {  
-					// Execute one time-step for the game  
+					long beginTimeMillis, timeTakenMillis, timeLeftMillis;  
+					beginTimeMillis = System.currentTimeMillis();  
+					// Execute one game step  
 					gameUpdate();  
-					
 					// Refresh the display  
 					repaint();  
+					// Provide the necessary delay to meet the target rate  
+					timeTakenMillis = System.currentTimeMillis() - beginTimeMillis;  
+					timeLeftMillis = 1000L / UPDATE_RATE - timeTakenMillis;  
+					if (timeLeftMillis < 5) timeLeftMillis = 5; // Set a minimum  
 					
 					// Delay and give other thread a chance  
 					try {  
-						Thread.sleep(1000 / UPDATE_RATE);  
+						Thread.sleep(timeLeftMillis); 
 					} catch (InterruptedException ex) {}  
 				}  
 			}  
 		};  
-		
 		gameThread.start();  // Invoke GameThread.run()  
 	}  
 	
-	/**  * One game time-step.  
-	 *  Update the game objects, with proper collision detection and response.  */  
+	/**  
+	 * One game time-step.  
+	 * Update the game objects, with proper collision detection and response.  
+	 */  
 	public void gameUpdate() {  
-		// Detect collision for this ball with the container box.  
-		ball.intersect(box);  
-		// Update the ball's state with proper collision response if collided.  
-		ball.update();  
+		float timeLeft = 1.0f;  // One time-step to begin with  
+		// Repeat until the one time-step is up  
+		do {  // Need to find the earliest collision time among all objects  
+			float earliestCollisionTime = timeLeft;  
+			// Special case here as there is only one moving ball.  
+			ball.intersect(box, timeLeft);  
+			if (ball.earliestCollisionResponse.t < earliestCollisionTime) {  
+				earliestCollisionTime = ball.earliestCollisionResponse.t;    
+			}  // Update all the objects for earliestCollisionTime  
+			ball.update(earliestCollisionTime);  
+			// Testing Only - Show collision position  
+			if (earliestCollisionTime > 0.05) { // Do not display small changes  
+				repaint();  
+				try {  
+					Thread.sleep((long)(1000L / UPDATE_RATE * earliestCollisionTime)); 
+				} catch (InterruptedException ex) {}  
+			}
+			timeLeft -= earliestCollisionTime;  // Subtract the time consumed and repeat  
+		} while (timeLeft > EPSILON_TIME);     // Ignore remaining time less than threshold  
 	}  
-	
-	
 	/** The custom drawing panel for the bouncing ball (inner class). */  
 	class DrawCanvas extends JPanel {  
 		/** Custom drawing codes */  
