@@ -1,5 +1,5 @@
 package ball;
-import java.awt.*;  
+import java.awt.*;
 import java.util.Formatter;
 
 import collisionphysics.CollisionPhysics;

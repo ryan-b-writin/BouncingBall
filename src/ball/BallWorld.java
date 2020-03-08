@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Random; 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**  * The control logic and main display panel for game.  */ 
 
@@ -14,6 +16,8 @@ public class BallWorld extends JPanel {
 	private DrawCanvas canvas; // Custom canvas for drawing the box/ball  
 	private int canvasWidth;  
 	private int canvasHeight; 
+	private ControlPanel control;	
+	boolean paused;
 	
 	/**  * Constructor to create the UI components and init the game objects.  
 	* Set the drawing canvas to fill the screen (given its width and height).
@@ -52,6 +56,12 @@ public class BallWorld extends JPanel {
 			}  
 		});  
 		
+		control = new ControlPanel();
+		
+		this.setLayout(new BorderLayout());
+		this.add(canvas,BorderLayout.CENTER);
+		this.add(control,BorderLayout.SOUTH);
+		
 		// Start the ball bouncing  
 		gameStart();  
 	}  
@@ -62,11 +72,14 @@ public class BallWorld extends JPanel {
 			public void run() {  
 				while (true) {  
 					long beginTimeMillis, timeTakenMillis, timeLeftMillis;  
-					beginTimeMillis = System.currentTimeMillis();  
-					// Execute one game step  
-					gameUpdate();  
-					// Refresh the display  
-					repaint();  
+					beginTimeMillis = System.currentTimeMillis();
+					
+					if(!paused) {
+						// Execute one game step  
+						gameUpdate();  
+						// Refresh the display  
+						 repaint();  
+					}
 					// Provide the necessary delay to meet the target rate  
 					timeTakenMillis = System.currentTimeMillis() - beginTimeMillis;  
 					timeLeftMillis = 1000L / UPDATE_RATE - timeTakenMillis;  
@@ -107,6 +120,7 @@ public class BallWorld extends JPanel {
 			timeLeft -= earliestCollisionTime;  // Subtract the time consumed and repeat  
 		} while (timeLeft > EPSILON_TIME);     // Ignore remaining time less than threshold  
 	}  
+	
 	/** The custom drawing panel for the bouncing ball (inner class). */  
 	class DrawCanvas extends JPanel {  
 		/** Custom drawing codes */  
@@ -132,5 +146,67 @@ public class BallWorld extends JPanel {
 		} 
 		
 		
+	}
+	
+	/** The control panel (inner class). */  
+	class ControlPanel extends JPanel {  
+		/** Constructor to initialize UI components of the controls */  
+		public ControlPanel() {  
+			// A checkbox to toggle pause/resume movement  
+			JCheckBox pauseControl = new JCheckBox();  
+			this.add(new JLabel("Pause"));  
+			this.add(pauseControl);  
+			pauseControl.addItemListener(new ItemListener() {  
+				@Override  
+				public void itemStateChanged(ItemEvent e) {  
+					paused = !paused;  // Toggle pause/resume flag  
+				}  
+			});  
+			// A slider for adjusting the speed of the ball  
+			int minSpeed = 2;  
+			int maxSpeed = 20;  
+			JSlider speedControl = new JSlider(JSlider.HORIZONTAL, minSpeed, maxSpeed,(int)ball.getSpeed());  
+			this.add(new JLabel("Speed"));  
+			this.add(speedControl);  
+			speedControl.addChangeListener((ChangeListener) new ChangeListener() {  
+				@Override  
+				public void stateChanged(ChangeEvent e) {  
+					JSlider source = (JSlider)e.getSource();  
+					if (!source.getValueIsAdjusting()) {  
+						int newSpeed = (int)source.getValue();  
+						int currentSpeed = (int)ball.getSpeed();  
+						ball.speedX *= (float)newSpeed / currentSpeed ;  
+						ball.speedY *= (float)newSpeed / currentSpeed;  
+					}  
+				}  
+			});  
+			// A slider for adjusting the radius of the ball  
+			int minRadius = 10;  
+			int maxRadius = ((canvasHeight > canvasWidth) ? canvasWidth: canvasHeight) / 2 - 8;  
+			JSlider radiusControl = new JSlider(JSlider.HORIZONTAL, minRadius,maxRadius,(int)ball.radius);  
+			this.add(new JLabel("Ball Radius"));  
+			this.add(radiusControl);  
+			radiusControl.addChangeListener(new ChangeListener() {  
+				@Override  
+				public void stateChanged(ChangeEvent e) {  
+					JSlider source = (JSlider)e.getSource();  
+					if (!source.getValueIsAdjusting()) {  
+						float newRadius = source.getValue();  
+						ball.radius = newRadius;  
+						// Reposition the ball such as it is inside the box  
+						if (ball.x - ball.radius < box.minX) {  
+							ball.x = ball.radius + 1;  
+						} else if (ball.x + ball.radius > box.maxX) {  
+							ball.x = box.maxX - ball.radius - 1;  
+						}  
+						if (ball.y - ball.radius < box.minY) {  
+							ball.y = ball.radius + 1;  
+						} else if (ball.y + ball.radius > box.maxY) {  
+							ball.y = box.maxY - ball.radius - 1;  
+						}  
+					}  
+				}  
+			});  
+		}  
 	}  
 }
