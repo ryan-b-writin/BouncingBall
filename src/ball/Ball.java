@@ -130,9 +130,37 @@ public class Ball {
 			this.x += this.speedX * time;          
 			this.y += this.speedY * time;          
 		}  
-		// Clear for the next collision detection  earliestCollisionResponse.reset();  
+		// Clear for the next collision detection  
+		earliestCollisionResponse.reset();  
+	}
+		
+		// Working copy for computing response in intersect(Ball, timeLimit),  
+		// to avoid repeatedly allocating objects.  
+	private CollisionResponse thisResponse = new CollisionResponse();  
+	private CollisionResponse anotherResponse = new CollisionResponse();  
+	
+	/**  * Check if this ball collides with the given another ball in the interval  
+	 *  (0, timeLimit].  */  
+	public void intersect(Ball another, float timeLimit) {  
+		// Call movingPointIntersectsMovingPoint() with timeLimit.  
+		// Use thisResponse and anotherResponse, as the working copies, to store the  
+		// responses of this ball and another ball, respectively.  
+		// Check if this collision is the earliest collision, and update the ball's  
+		// earliestCollisionResponse accordingly.  
+	      CollisionPhysics.pointIntersectsMovingPoint(
+	              this.x, this.y, this.speedX, this.speedY, this.radius,
+	              another.x, another.y, another.speedX, another.speedY, another.radius,
+	              timeLimit, thisResponse, anotherResponse);
+		if (anotherResponse.t < another.earliestCollisionResponse.t) {  
+			another.earliestCollisionResponse.copy(anotherResponse);  
+		}  if (thisResponse.t < this.earliestCollisionResponse.t) {  
+			this.earliestCollisionResponse.copy(thisResponse);  
+		}  
 	}  
 }
+	
+
+
 		
 		
 	
