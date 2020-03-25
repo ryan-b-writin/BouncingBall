@@ -193,9 +193,12 @@ public void gameUpdate() {
 	
 	/** The control panel (inner class). */  
 	class ControlPanel extends JPanel {  
-		/** Constructor to initialize UI components of the controls */  
+		
+		/** Constructor to initialize UI components */  
 		public ControlPanel() {  
-			// A checkbox to toggle pause/resume movement  
+			
+		
+			// A checkbox to toggle pause/resume all the balls' movement  
 			JCheckBox pauseControl = new JCheckBox();  
 			this.add(new JLabel("Pause"));  
 			this.add(pauseControl);  
@@ -205,47 +208,44 @@ public void gameUpdate() {
 					paused = !paused;  // Toggle pause/resume flag  
 				}  
 			});  
-			// A slider for adjusting the speed of the ball  
-			int minSpeed = 2;  
-			int maxSpeed = 20;  
-			JSlider speedControl = new JSlider(JSlider.HORIZONTAL, minSpeed, maxSpeed,(int)ball.getSpeed());  
+			
+			// A slider for adjusting the speed of all the balls by a factor  
+			final float[] ballSavedSpeedXs = new float[MAX_BALLS];  
+			final float[] ballSavedSpeedYs = new float[MAX_BALLS];  
+			for (int i = 0; i < currentNumBalls; ++i) {  
+				ballSavedSpeedXs[i] = balls[i].speedX;  
+				ballSavedSpeedYs[i] = balls[i].speedY;  
+			}  
+			int minFactor = 5;    // percent  
+			int maxFactor = 200;  // percent  
+			JSlider speedControl = new JSlider(JSlider.HORIZONTAL, minFactor, maxFactor, 100);  
 			this.add(new JLabel("Speed"));  
 			this.add(speedControl);  
-			speedControl.addChangeListener((ChangeListener) new ChangeListener() {  
+			speedControl.addChangeListener(new ChangeListener() {  
 				@Override  
 				public void stateChanged(ChangeEvent e) {  
 					JSlider source = (JSlider)e.getSource();  
 					if (!source.getValueIsAdjusting()) {  
-						int newSpeed = (int)source.getValue();  
-						int currentSpeed = (int)ball.getSpeed();  
-						ball.speedX *= (float)newSpeed / currentSpeed ;  
-						ball.speedY *= (float)newSpeed / currentSpeed;  
+						int percentage = (int)source.getValue();  
+						for (int i = 0; i < currentNumBalls; ++i) {  
+							balls[i].speedX = ballSavedSpeedXs[i] * percentage / 100.0f;  
+							balls[i].speedY = ballSavedSpeedYs[i] * percentage / 100.0f;  
+						}  
 					}  
 				}  
 			});  
-			// A slider for adjusting the radius of the ball  
-			int minRadius = 10;  
-			int maxRadius = ((canvasHeight > canvasWidth) ? canvasWidth: canvasHeight) / 2 - 8;  
-			JSlider radiusControl = new JSlider(JSlider.HORIZONTAL, minRadius,maxRadius,(int)ball.radius);  
-			this.add(new JLabel("Ball Radius"));  
-			this.add(radiusControl);  
-			radiusControl.addChangeListener(new ChangeListener() {  
+			
+			// A button for launching the remaining balls  
+			final JButton launchControl = new JButton("Launch New Ball");  
+			this.add(launchControl);  
+			launchControl.addActionListener(new ActionListener() {  
 				@Override  
-				public void stateChanged(ChangeEvent e) {  
-					JSlider source = (JSlider)e.getSource();  
-					if (!source.getValueIsAdjusting()) {  
-						float newRadius = source.getValue();  
-						ball.radius = newRadius;  
-						// Reposition the ball such as it is inside the box  
-						if (ball.x - ball.radius < box.minX) {  
-							ball.x = ball.radius + 1;  
-						} else if (ball.x + ball.radius > box.maxX) {  
-							ball.x = box.maxX - ball.radius - 1;  
-						}  
-						if (ball.y - ball.radius < box.minY) {  
-							ball.y = ball.radius + 1;  
-						} else if (ball.y + ball.radius > box.maxY) {  
-							ball.y = box.maxY - ball.radius - 1;  
+				public void actionPerformed(ActionEvent e) {  
+					if (currentNumBalls < MAX_BALLS) {  
+						++currentNumBalls;  
+						if (currentNumBalls == MAX_BALLS) {  
+							// Disable the button, as there is no more ball  
+							launchControl.setEnabled(false);  
 						}  
 					}  
 				}  
@@ -253,3 +253,8 @@ public void gameUpdate() {
 		}  
 	}  
 }
+						
+					
+				
+			
+				
