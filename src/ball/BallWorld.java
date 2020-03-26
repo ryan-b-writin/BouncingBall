@@ -57,7 +57,7 @@ public class BallWorld extends JPanel {
 		ball = new Ball(x, y, radius, speed, angleInDegree, Color.RED);  
 		
 		// Init the Container Box to fill the screen  
-		box = new ContainerBox(0, 0, canvasWidth, canvasHeight, Color.GRAY, Color.WHITE); 
+		box = new ContainerBox(0, 0, canvasWidth, canvasHeight, Color.BLACK, Color.WHITE); 
 		
 		// Init the custom drawing panel for drawing the game  
 		canvas = new DrawCanvas();  
