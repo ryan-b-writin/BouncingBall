@@ -139,8 +139,10 @@ public class BallWorld extends JPanel {
                     balls[i].intersect(balls[j], tMin);
                     if (balls[i].earliestCollisionResponse.t < tMin) {
                        tMin = balls[i].earliestCollisionResponse.t;
-                       balls[i].setColor(Color.GREEN);
-                       balls[j].setColor(Color.MAGENTA);
+                       Color color1 = balls[i].getColor();
+                       Color color2 = balls[j].getColor();
+                       balls[i].setColor(color2);
+                       balls[j].setColor(color1);
                     }
                  }
               }
