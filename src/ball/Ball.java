@@ -26,7 +26,7 @@ public class Ball {
 		this.x = x;  this.y = y;  // Convert (speed, angle) to (x, y), with y-axis inverted  
 		this.speedX = (float)(speed * Math.cos(Math.toRadians(angleInDegree)));  
 		this.speedY = (float)(-speed * (float)Math.sin(Math.toRadians(angleInDegree)));  
-		this.radius = radius;  this.color = color;  }  
+		this.radius = radius;  this.setColor(color);  }  
 	
 	/** Constructor with the default color */  
 	public Ball(float x, float y, float radius, float speed, float angleInDegree) {  
@@ -34,7 +34,7 @@ public class Ball {
 	}  
 	
 	/** Draw itself using the given graphics context. */  
-	public void draw(Graphics g) {  g.setColor(color); 
+	public void draw(Graphics g) {  g.setColor(getColor()); 
 		g.fillOval((int)(x - radius), (int)(y - radius), (int)(2 * radius), (int)(2 * radius));  
 	}  
 	
@@ -156,6 +156,14 @@ public class Ball {
 		}  if (thisResponse.t < this.earliestCollisionResponse.t) {  
 			this.earliestCollisionResponse.copy(thisResponse);  
 		}  
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
 	}  
 }
 	

@@ -121,7 +121,7 @@ public class BallWorld extends JPanel {
 	 * One game time-step.  
 	 * Update the game objects, with proper collision detection and response.  
 	 */  
-public void gameUpdate() {
+	public void gameUpdate() {
         
         int currentNumBalls = balls.length;
           
@@ -139,6 +139,8 @@ public void gameUpdate() {
                     balls[i].intersect(balls[j], tMin);
                     if (balls[i].earliestCollisionResponse.t < tMin) {
                        tMin = balls[i].earliestCollisionResponse.t;
+                       balls[i].setColor(Color.GREEN);
+                       balls[j].setColor(Color.MAGENTA);
                     }
                  }
               }
