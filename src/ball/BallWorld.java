@@ -41,11 +41,11 @@ public class BallWorld extends JPanel {
 		balls[7] = new Ball(100, 240, 40, 2, 60, Color.ORANGE);  
 		balls[8] = new Ball(250, 400, 50, 3, -42, Color.BLUE);  
 		balls[9] = new Ball(200, 80, 70, 6, -84, Color.CYAN);  
-		balls[10] = new Ball(500, 170, 90, 6, -42, Color.MAGENTA);  
+		balls[10] = new Ball(500, 170, 90, 6, -42, Color.MAGENTA);
 		
 		// The rest of the balls, that can be launched using the launch button  
 		for (int i = currentNumBalls; i < MAX_BALLS; ++i) {  
-			balls[i] = new Ball(20, canvasHeight - 20, 15, 5, 45, Color.RED);  
+			balls[i] = new Ball(20, canvasHeight - 20, 15, 5, 45, Color.WHITE);  
 		}
 
 		// Init the ball at a random location (inside the box) and moveAngle  
@@ -54,7 +54,7 @@ public class BallWorld extends JPanel {
 		int x = rand.nextInt(canvasWidth - radius * 2 - 20) + radius + 10;  
 		int y = rand.nextInt(canvasHeight - radius * 2 - 20) + radius + 10; 
 		int speed = 5;  int angleInDegree = rand.nextInt(360);  
-		ball = new Ball(x, y, radius, speed, angleInDegree, Color.RED);  
+//		ball = new Ball(x, y, radius, speed, angleInDegree, Color.RED);  
 		
 		// Init the Container Box to fill the screen  
 		box = new ContainerBox(0, 0, canvasWidth, canvasHeight, Color.BLACK, Color.WHITE); 
@@ -178,11 +178,6 @@ public class BallWorld extends JPanel {
 			for(int i=0 ; i < balls.length ; i++) {
 				balls[i].draw(g); 
 			}
-			
-			// Display ball's information  
-			g.setColor(Color.WHITE);  
-			g.setFont(new Font("Courier New", Font.PLAIN, 12));  
-			g.drawString("Ball " + ball.toString(), 20, 30);  
 		}  
 		
 		/** Called back to get the preferred size of the component. */  
@@ -247,6 +242,7 @@ public class BallWorld extends JPanel {
 				public void actionPerformed(ActionEvent e) {  
 					if (currentNumBalls < MAX_BALLS) {  
 						++currentNumBalls;  
+						
 						if (currentNumBalls == MAX_BALLS) {  
 							// Disable the button, as there is no more ball  
 							launchControl.setEnabled(false);  
