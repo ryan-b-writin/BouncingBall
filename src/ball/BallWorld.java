@@ -54,7 +54,6 @@ public class BallWorld extends JPanel {
 		int x = rand.nextInt(canvasWidth - radius * 2 - 20) + radius + 10;  
 		int y = rand.nextInt(canvasHeight - radius * 2 - 20) + radius + 10; 
 		int speed = 5;  int angleInDegree = rand.nextInt(360);  
-//		ball = new Ball(x, y, radius, speed, angleInDegree, Color.RED);  
 		
 		// Init the Container Box to fill the screen  
 		box = new ContainerBox(0, 0, canvasWidth, canvasHeight, Color.BLACK, Color.WHITE); 
